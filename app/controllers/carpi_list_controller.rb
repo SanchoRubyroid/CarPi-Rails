@@ -1,0 +1,2 @@
+class CarpiListController < ApplicationController
+end

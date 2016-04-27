@@ -1,0 +1,71 @@
+= javascript_include_tag '/elm/control_module/elm'
+= javascript_include_tag 'https://www.gstatic.com/charts/loader.js'
+
+h1 CarpiControl
+#carpi-control-container style="height:100px"
+#chart-container
+
+javascript:
+  var container = document.getElementById('carpi-control-container');
+  var elmApp = Elm.embed(Elm.CarPi, container)
+  var controlModel = {}
+
+  var socket = io('http://localhost:4001/control');
+  socket.emit('controlled', '#{params['id']}');
+
+  google.charts.load('current', {'packages': ['gauge']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+    var data = google.visualization.arrayToDataTable([
+      ['Label', 'Value'],
+      ['Torque', 0]
+    ]);
+
+    var options = {
+              width: 400,
+              height: 200,
+              redFrom: 90, redTo: 100,
+              yellowFrom: 75, yellowTo: 90,
+              minorTicks: 5,
+              majorTicks: ['0', 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+              animation: {
+                duration: 0
+              }
+            };
+
+    var chart = new google.visualization.Gauge(document.getElementById('chart-container'));
+
+    elmApp.ports.externalModel.subscribe(function (model) {
+      compressedModel = getCompressedData(model)
+
+      if (!(JSON.stringify(controlModel) === JSON.stringify(compressedModel))) {
+        controlModel = compressedModel;
+        socket.emit('car-control', controlModel);
+
+        data.setValue(0, 1, controlModel[0]);
+        chart.draw(data, options);
+      }
+    });
+  }
+
+  // TODO move to helper
+  function getCompressedData(model) {
+    var values = []
+    var stateByte = 0
+
+    var torqueReversedMask = 0b00000100
+    var directionRightMask = 0b00000001
+    var directionLeftMask = 0b00000010
+
+    if (model.torqueReversed) stateByte |= torqueReversedMask
+    if (model.direction > 0) stateByte |= directionRightMask
+    else if (model.direction < 0) stateByte |= directionLeftMask
+
+    values.push(parseInt(model.torqueLevel))
+    values.push(parseInt(model.directionLevel))
+    values.push(stateByte)
+
+    return values
+  }

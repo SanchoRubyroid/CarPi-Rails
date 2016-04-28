@@ -10302,11 +10302,17 @@ Elm.CarPiList.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var vehicles = Elm.Native.Port.make(_elm).inboundSignal("vehicles",
-   "List String",
+   "( List String, List String )",
    function (v) {
-      return typeof v === "object" && v instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.map(function (v) {
-         return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
-      })) : _U.badPort("an array",v);
+      return typeof v === "object" && v instanceof Array ? {ctor: "_Tuple2"
+                                                           ,_0: typeof v[0] === "object" && v[0] instanceof Array ? Elm.Native.List.make(_elm).fromArray(v[0].map(function (v) {
+                                                              return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
+                                                              v);
+                                                           })) : _U.badPort("an array",v[0])
+                                                           ,_1: typeof v[1] === "object" && v[1] instanceof Array ? Elm.Native.List.make(_elm).fromArray(v[1].map(function (v) {
+                                                              return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
+                                                              v);
+                                                           })) : _U.badPort("an array",v[1])} : _U.badPort("an array",v);
    });
    var view = F2(function (address,model) {
       var carItem = function (car) {
@@ -10314,9 +10320,11 @@ Elm.CarPiList.make = function (_elm) {
          _U.list([$Html$Attributes.$class("mdl-navigation__link"),$Html$Attributes.href(A2($Basics._op["++"],"/control/",car))]),
          _U.list([$Html.text(car)]));
       };
-      var list = $List.isEmpty(model.cars) ? _U.list([A2($Html.a,
-      _U.list([$Html$Attributes.$class("mdl-navigation__link"),$Html$Attributes.href("#")]),
-      _U.list([$Html.text("No Vehicles online")]))]) : A2($List.map,carItem,model.cars);
+      var disabledLink = function (linkText) {    return A2($Html.span,_U.list([]),_U.list([$Html.text(linkText)]));};
+      var capturedCarItem = function (car) {    return disabledLink(car);};
+      var list = $List.isEmpty(model.cars) && $List.isEmpty(model.capturedCars) ? _U.list([disabledLink("No Vehicles online")]) : A2($List.append,
+      A2($List.map,carItem,model.cars),
+      A2($List.map,capturedCarItem,model.capturedCars));
       return A2($Html.div,_U.list([]),list);
    });
    var update = F2(function (action,model) {
@@ -10324,17 +10332,18 @@ Elm.CarPiList.make = function (_elm) {
       if (_p0.ctor === "NoOp") {
             return model;
          } else {
-            return _U.update(model,{cars: _p0._0});
+            var _p1 = _p0._0;
+            return _U.update(model,{cars: $Basics.fst(_p1),capturedCars: $Basics.snd(_p1)});
          }
    });
    var SetCarsList = function (a) {    return {ctor: "SetCarsList",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var inbox = $Signal.mailbox(NoOp);
    var actions = A2($Signal.merge,inbox.signal,A2($Signal.map,SetCarsList,vehicles));
-   var initialModel = {cars: _U.list([])};
+   var initialModel = {cars: _U.list([]),capturedCars: _U.list([])};
    var model = A3($Signal.foldp,update,initialModel,actions);
    var main = A2($Signal.map,view(inbox.address),model);
-   var Model = function (a) {    return {cars: a};};
+   var Model = F2(function (a,b) {    return {cars: a,capturedCars: b};});
    return _elm.CarPiList.values = {_op: _op
                                   ,Model: Model
                                   ,initialModel: initialModel

@@ -7,16 +7,20 @@ import Html.Events exposing (..)
 -- MODEL
 
 type alias Model =
-  { cars : List String }
+  { cars : List String,
+    capturedCars : List String
+  }
 
 
 initialModel : Model
 initialModel =
-  { cars = [] }
+  { cars = [],
+    capturedCars = []
+  }
 
 -- UPDATE
 
-type Action = NoOp | SetCarsList (List String)
+type Action = NoOp | SetCarsList ((List String), (List String))
 
 update : Action -> Model -> Model
 update action model =
@@ -24,26 +28,33 @@ update action model =
     NoOp ->
       model
     SetCarsList newCarsList ->
-      { model | cars = newCarsList }
+      { model |
+        cars = fst newCarsList,
+        capturedCars = snd newCarsList
+      }
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
+    disabledLink linkText=
+      span [ ] [ text linkText ]
     carItem car =
       a [ class "mdl-navigation__link", href ("/control/" ++ car) ] [ text car ]
+    capturedCarItem car =
+      disabledLink car
     list =
-      if List.isEmpty model.cars then
-        [ a [ class "mdl-navigation__link", href "#" ] [ text "No Vehicles online"] ]
+      if List.isEmpty model.cars && List.isEmpty model.capturedCars then
+        [ disabledLink "No Vehicles online" ]
       else
-        List.map carItem model.cars
+        List.append (List.map carItem model.cars) (List.map capturedCarItem model.capturedCars)
   in
     div [] list
 
 -- PORTS
 
-port vehicles : Signal (List String)
+port vehicles : Signal ((List String), (List String))
 
 -- SIGNALS
 

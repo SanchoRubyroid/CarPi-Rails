@@ -10,7 +10,7 @@ javascript:
   var elmApp = Elm.embed(Elm.CarPi, container)
   var controlModel = {}
 
-  var socket = io('http://localhost:4001/control');
+  var socket = io('#{Rails.application.config.node_app_url}/control');
   socket.emit('controlled', '#{params['id']}');
 
   google.charts.load('current', {'packages': ['gauge']});

@@ -4,7 +4,7 @@ javascript:
 
   var container = document.getElementById('carpi-list-container');
   var elmApp = Elm.embed(Elm.CarPiList, container, {vehicles: [[],[]]})
-  var socket = io('http://localhost:4001/list');
+  var socket = io('#{Rails.application.config.node_app_url}/list');
 
   socket.on('cars-list', function (list) {
     elmApp.ports.vehicles.send(list);

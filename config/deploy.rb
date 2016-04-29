@@ -44,7 +44,7 @@ set :deploy_to, '/var/rails/carpi'
 namespace :deploy do
   task :custom_symlink do
     on roles(:app) do
-      info 'Creating secure symlinks'
+      info 'Creating symlinks'
       %w{ database secrets }.each do |yaml_name|
         execute "rm #{fetch(:release_path)}/config/#{yaml_name}.yml"
         execute "ln -nfs #{fetch(:deploy_to)}/secure/#{yaml_name}.yml #{fetch(:release_path)}/config/#{yaml_name}.yml"
@@ -60,18 +60,28 @@ namespace :deploy do
       logs_path = "#{fetch(:deploy_to)}/shared/logs"
       pid_files_path = "#{fetch(:deploy_to)}/shared/pids"
 
-      forever_options = ['-a -w']
+      forever_options = ['-a']
       forever_options << "-o #{logs_path}/node_app.log"
       forever_options << "-l #{logs_path}/node_app.log"
       forever_options << "-e #{logs_path}/node_app.err.log"
       forever_options << "--pidfile #{pid_files_path}/node_app.pid"
-      forever_options << "--minUptime 0"
-      forever_options << "--watchDirectory '.'"
+      forever_options << "--workingDir #{node_app_path}"
+      forever_options << "--minUptime 1000"
+      forever_options << "--spinSleepTime 2000"
+
 
 
       execute "cd #{node_app_path} && git pull"
       execute 'forever stopall'
       execute "forever start #{forever_options.join(' ')} #{node_app_path}/main.js"
+    end
+  end
+
+  task :checkout_elm_modules do
+    on roles(:app) do
+      info 'Checkout ELM modules'
+
+      execute "cd #{fetch(:release_path)}/public/elm && git clone https://github.com/SanchoRubyroid/CarPi-Elm.git control_module"
     end
   end
 
@@ -86,5 +96,6 @@ namespace :deploy do
 
   after :finishing, 'deploy:cleanup'
   after :finishing, 'deploy:start_node_app'
+  after :finishing, 'deploy:checkout_elm_modules'
   after 'symlink:shared', 'deploy:custom_symlink'
 end

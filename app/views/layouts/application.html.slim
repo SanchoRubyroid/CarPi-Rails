@@ -8,19 +8,33 @@ html
     title CarPi Management
     = stylesheet_link_tag 'application', media: 'all'
     = stylesheet_link_tag 'https://fonts.googleapis.com/icon?family=Material+Icons'
+    = stylesheet_link_tag 'http://fonts.googleapis.com/css?family=Roboto:100'
 
     = javascript_include_tag 'application'
 
     = csrf_meta_tags
 
   body
-    .mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer
-      .mdl-layout__drawer
+    .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+      header.mdl-layout__header
+        .mdl-layout__header-row
+          span.mdl-layout-title CarPi Web
+          .mdl-layout-spacer
+          nav.mdl-navigation.mdl-layout--large-screen-only
+            = link_to('Home', root_path, {class: 'mdl-navigation__link'})
+            = link_to('Link', '#', {class: 'mdl-navigation__link'})
+            = link_to('Link', '#', {class: 'mdl-navigation__link'})
+            = link_to('Link', '#', {class: 'mdl-navigation__link'})
+
       .mdl-layout__drawer
         span.mdl-layout-title CarPi Web
         nav.mdl-navigation
-          #carpi-list-container
-            = link_to('Home', root_path, {class: 'mdl-navigation__link'})
+          = link_to('Home', root_path, {class: 'mdl-navigation__link'})
+          = link_to('Link', '#', {class: 'mdl-navigation__link'})
+          = link_to('Link', '#', {class: 'mdl-navigation__link'})
+          = link_to('Link', '#', {class: 'mdl-navigation__link'})
       main.mdl-layout__content
-        .page-content
-          = yield
+        = yield
+
+
+          /  =

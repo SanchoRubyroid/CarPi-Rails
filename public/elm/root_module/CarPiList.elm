@@ -38,19 +38,34 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    disabledLink linkText=
-      span [ ] [ text linkText ]
-    carItem car =
-      a [ class "mdl-navigation__link", href ("/control/" ++ car) ] [ text car ]
+    buildCardLink location linkText =
+      a [ class "mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect", href location ] [ text linkText ]
+    carLink car captured =
+      if captured then
+        buildCardLink "#" "Request Release"
+      else
+        buildCardLink ("/control/" ++ car) "Control"
+    carItem car captured =
+      div [ class "mdl-cell mdl-cell--12-col" ] [
+        div [ class "mdl-card mdl-shadow--2dp center-card car-card" ] [
+          div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text" ] [ text car ] ],
+          div [ class "mdl-card__actions mdl-card--border" ] [ carLink car captured ],
+          div [ class "mdl-card__menu" ] [
+            button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ] [ i [ class "material-icons" ] [ text "share" ] ]
+          ]
+        ]
+      ]
+    activeCarItem car =
+      carItem car False
     capturedCarItem car =
-      disabledLink car
+      carItem car True
     list =
       if List.isEmpty model.cars && List.isEmpty model.capturedCars then
-        [ disabledLink "No Vehicles online" ]
+        [ h1 [ class "center-it" ] [ text "No Vehicles online" ] ]
       else
-        List.append (List.map carItem model.cars) (List.map capturedCarItem model.capturedCars)
+        List.append (List.map activeCarItem model.cars) (List.map capturedCarItem model.capturedCars)
   in
-    div [] list
+    div [ class "mdl-grid" ] list
 
 -- PORTS
 

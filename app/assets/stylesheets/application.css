@@ -13,3 +13,17 @@
  *= require_tree .
  *= require_self
  */
+
+.center-it {
+    margin: auto;
+}
+
+.center-card {
+    margin: auto;
+    width: 365px;
+}
+
+.car-card .default-pic {
+    background: url('http://www.iconeasy.com/icon/png/Transport/Real%20Vista%20Transportation/vintage%20car.png') center / cover;
+    height: 300px;
+}

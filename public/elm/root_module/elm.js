@@ -10315,17 +10315,35 @@ Elm.CarPiList.make = function (_elm) {
                                                            })) : _U.badPort("an array",v[1])} : _U.badPort("an array",v);
    });
    var view = F2(function (address,model) {
-      var carItem = function (car) {
+      var buildCardLink = F2(function (location,linkText) {
          return A2($Html.a,
-         _U.list([$Html$Attributes.$class("mdl-navigation__link"),$Html$Attributes.href(A2($Basics._op["++"],"/control/",car))]),
-         _U.list([$Html.text(car)]));
-      };
-      var disabledLink = function (linkText) {    return A2($Html.span,_U.list([]),_U.list([$Html.text(linkText)]));};
-      var capturedCarItem = function (car) {    return disabledLink(car);};
-      var list = $List.isEmpty(model.cars) && $List.isEmpty(model.capturedCars) ? _U.list([disabledLink("No Vehicles online")]) : A2($List.append,
-      A2($List.map,carItem,model.cars),
-      A2($List.map,capturedCarItem,model.capturedCars));
-      return A2($Html.div,_U.list([]),list);
+         _U.list([$Html$Attributes.$class("mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"),$Html$Attributes.href(location)]),
+         _U.list([$Html.text(linkText)]));
+      });
+      var carLink = F2(function (car,captured) {
+         return captured ? A2(buildCardLink,"#","Request Release") : A2(buildCardLink,A2($Basics._op["++"],"/control/",car),"Control");
+      });
+      var carItem = F2(function (car,captured) {
+         return A2($Html.div,
+         _U.list([$Html$Attributes.$class("mdl-cell mdl-cell--12-col")]),
+         _U.list([A2($Html.div,
+         _U.list([$Html$Attributes.$class("mdl-card mdl-shadow--2dp center-card car-card")]),
+         _U.list([A2($Html.div,
+                 _U.list([$Html$Attributes.$class("mdl-card__title default-pic")]),
+                 _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text")]),_U.list([$Html.text(car)]))]))
+                 ,A2($Html.div,_U.list([$Html$Attributes.$class("mdl-card__actions mdl-card--border")]),_U.list([A2(carLink,car,captured)]))
+                 ,A2($Html.div,
+                 _U.list([$Html$Attributes.$class("mdl-card__menu")]),
+                 _U.list([A2($Html.button,
+                 _U.list([$Html$Attributes.$class("mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect")]),
+                 _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("material-icons")]),_U.list([$Html.text("share")]))]))]))]))]));
+      });
+      var activeCarItem = function (car) {    return A2(carItem,car,false);};
+      var capturedCarItem = function (car) {    return A2(carItem,car,true);};
+      var list = $List.isEmpty(model.cars) && $List.isEmpty(model.capturedCars) ? _U.list([A2($Html.h1,
+      _U.list([$Html$Attributes.$class("center-it")]),
+      _U.list([$Html.text("No Vehicles online")]))]) : A2($List.append,A2($List.map,activeCarItem,model.cars),A2($List.map,capturedCarItem,model.capturedCars));
+      return A2($Html.div,_U.list([$Html$Attributes.$class("mdl-grid")]),list);
    });
    var update = F2(function (action,model) {
       var _p0 = action;

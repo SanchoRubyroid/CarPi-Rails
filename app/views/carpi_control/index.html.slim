@@ -23,7 +23,7 @@ javascript:
     //rcv_elm.val(current_val + (parseFloat(data.buffer.length) / 1024 / 1024))
   })
 
-  socket.emit('controlled', '#{params['id']}');
+  socket.emit('capture', '#{params['id']}');
 
   google.charts.load('current', {'packages': ['gauge']});
   google.charts.setOnLoadCallback(drawChart);

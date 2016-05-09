@@ -4,6 +4,8 @@
 h1 CarpiControl
 #carpi-control-container style="height:100px"
 #chart-container
+img#stream-container[style="width:100%"]
+//input#data-rcv[value="0"]
 
 javascript:
   var container = document.getElementById('carpi-control-container');
@@ -11,6 +13,16 @@ javascript:
   var controlModel = {}
 
   var socket = io('#{Rails.application.config.node_app_url}/control');
+
+  socket.on('stream', function (data) {
+    var img = document.getElementById('stream-container')
+    img.src = 'data:image/jpeg;base64, ' + data.buffer
+
+    //var rcv_elm = $('#data-rcv')
+    //var current_val = parseFloat(rcv_elm.val())
+    //rcv_elm.val(current_val + (parseFloat(data.buffer.length) / 1024 / 1024))
+  })
+
   socket.emit('controlled', '#{params['id']}');
 
   google.charts.load('current', {'packages': ['gauge']});

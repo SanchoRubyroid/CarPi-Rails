@@ -5,7 +5,8 @@ h1 CarpiControl
 #carpi-control-container style="height:100px"
 #chart-container
 img#stream-container[style="width:100%"]
-//input#data-rcv[value="0"]
+#received-data 0 Mb
+#fps-container
 
 javascript:
   var container = document.getElementById('carpi-control-container');
@@ -14,13 +15,26 @@ javascript:
 
   var socket = io('#{Rails.application.config.node_app_url}/control');
 
+  var frameTimestampPrev = Date.now()
+  var lastTimeFPSUpdated = Date.now()
+  var currentFPS = 0
+
+  var img = document.getElementById('stream-container')
+  var receivedDataElement = $('#received-data')
+
   socket.on('stream', function (data) {
-    var img = document.getElementById('stream-container')
     img.src = 'data:image/jpeg;base64, ' + data.buffer
 
-    //var rcv_elm = $('#data-rcv')
-    //var current_val = parseFloat(rcv_elm.val())
-    //rcv_elm.val(current_val + (parseFloat(data.buffer.length) / 1024 / 1024))
+    frameTimestampCurrent = Date.now()
+    if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
+      currentFPS = (1000 / (frameTimestampCurrent - frameTimestampPrev))
+      $('#fps-container').html('FPS: ' + Math.round(currentFPS))
+      lastTimeFPSUpdated = frameTimestampCurrent
+    }
+
+    frameTimestampPrev = frameTimestampCurrent
+
+    receivedDataElement.html((parseFloat(receivedDataElement.html()) + (parseFloat(data.buffer.length) / 1024 / 1024)).toFixed(2) + ' Mb')
   })
 
   socket.emit('capture', '#{params['id']}');

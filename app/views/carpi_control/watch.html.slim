@@ -1,0 +1,85 @@
+#stream-container
+  #progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
+
+  #info-container
+    #received-data 0 Mb
+    #fps-container
+
+javascript:
+  var socket = io('#{Rails.application.config.node_app_url}/watch');
+
+  var frameTimestampPrev = Date.now()
+  var lastTimeFPSUpdated = Date.now()
+  var currentFPS = 0
+
+  var streamContainer = $('#stream-container')
+  var receivedDataElement = $('#received-data')
+
+  setTimeout(function(){
+    if($('#progress-intermediate').length > 0) {
+      $('#progress-intermediate').removeClass('mdl-progress')
+      $('#progress-intermediate').html('<h4>No video response :(</h4>')
+
+      setTimeout(function(){
+        $('#progress-intermediate').remove()
+      }, 2000)
+    }
+  }, 5000)
+
+
+  $(window).resize(resizeHandler)
+  resizeHandler()
+
+  socket.on('stream', function (data) {
+    if($('#progress-intermediate').length > 0) {
+      $('#progress-intermediate').remove()
+      streamContainer.css('background-size', 'cover')
+    }
+
+    streamContainer.css('background-image', 'url("data:image/jpeg;base64, ' + data.buffer + '")')
+
+    frameTimestampCurrent = Date.now()
+    if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
+      currentFPS = (1000 / (frameTimestampCurrent - frameTimestampPrev))
+      $('#fps-container').html('FPS: ' + Math.round(currentFPS))
+      lastTimeFPSUpdated = frameTimestampCurrent
+    }
+
+    frameTimestampPrev = frameTimestampCurrent
+
+    receivedDataElement.html((parseFloat(receivedDataElement.html()) + (parseFloat(data.buffer.length) / 1024 / 1024)).toFixed(2) + ' Mb')
+  })
+
+  function resizeHandler(event) {
+    var newWidth = 0
+    var newHeight = 0
+    var currentWidth = $(window).width()
+    var currentHeight = $(window).height() - $('header').height()
+
+    if ((currentHeight / 9) * 16 < currentWidth) {
+      newWidth = (currentHeight / 9) * 16
+      newHeight = currentHeight
+    } else {
+      newWidth = currentWidth
+      newHeight = (currentWidth / 16) * 9
+    }
+
+    $('#stream-container').css({
+      height: newHeight + 'px',
+      width: newWidth + 'px'
+    })
+
+    if(event) {
+      gaugeDimensions = newHeight * 0.25
+      if (gaugeDimensions > 150)
+        gaugeDimensions = 150
+
+      torqueOptions.width = gaugeDimensions
+      torqueOptions.height = gaugeDimensions
+      directionOptions.width = gaugeDimensions
+      directionOptions.height = gaugeDimensions
+
+      torqueChart.draw(torqueData, torqueOptions);
+      directionChart.draw(directionData, directionOptions);
+    }
+  }

@@ -42,9 +42,9 @@ view address model =
       a [ class "mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect", href location ] [ text linkText ]
     carLink car captured =
       if captured then
-        buildCardLink "#" "Request Release"
+        [ buildCardLink "#" "Request Release", buildCardLink ("/watch/" ++ car) "Watch" ]
       else
-        buildCardLink ("/control/" ++ car) "Control"
+        [ buildCardLink ("/control/" ++ car) "Control" ]
     activeCarsCount = List.length model.cars
     capturedCarsCount = List.length model.capturedCars
     totalCarsCount = activeCarsCount + capturedCarsCount
@@ -53,7 +53,7 @@ view address model =
       div [ class ("mdl-cell mdl-cell--" ++ toString(layoutNumber) ++ "-col") ] [
         div [ class "mdl-card mdl-shadow--2dp center-card car-card" ] [
           div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text" ] [ text car ] ],
-          div [ class "mdl-card__actions mdl-card--border" ] [ carLink car captured ],
+          div [ class "mdl-card__actions mdl-card--border" ] (carLink car captured),
           div [ class "mdl-card__menu" ] [
             button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ] [ i [ class "material-icons" ] [ text "share" ] ]
           ]

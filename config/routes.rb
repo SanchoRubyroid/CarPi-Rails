@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   root 'carpi_list#index'
 
   get 'control/:id' => 'carpi_control#index'
+  get 'watch/:id' => 'carpi_control#watch'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase

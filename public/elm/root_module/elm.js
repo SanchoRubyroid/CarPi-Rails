@@ -10325,7 +10325,10 @@ Elm.CarPiList.make = function (_elm) {
          _U.list([$Html.text(linkText)]));
       });
       var carLink = F2(function (car,captured) {
-         return captured ? A2(buildCardLink,"#","Request Release") : A2(buildCardLink,A2($Basics._op["++"],"/control/",car),"Control");
+         return captured ? _U.list([A2(buildCardLink,"#","Request Release")
+                                   ,A2(buildCardLink,A2($Basics._op["++"],"/watch/",car),"Watch")]) : _U.list([A2(buildCardLink,
+         A2($Basics._op["++"],"/control/",car),
+         "Control")]);
       });
       var carItem = F2(function (car,captured) {
          return A2($Html.div,
@@ -10335,7 +10338,7 @@ Elm.CarPiList.make = function (_elm) {
          _U.list([A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__title default-pic")]),
                  _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text")]),_U.list([$Html.text(car)]))]))
-                 ,A2($Html.div,_U.list([$Html$Attributes.$class("mdl-card__actions mdl-card--border")]),_U.list([A2(carLink,car,captured)]))
+                 ,A2($Html.div,_U.list([$Html$Attributes.$class("mdl-card__actions mdl-card--border")]),A2(carLink,car,captured))
                  ,A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__menu")]),
                  _U.list([A2($Html.button,

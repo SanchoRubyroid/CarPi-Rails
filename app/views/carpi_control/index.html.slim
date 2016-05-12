@@ -1,12 +1,16 @@
 = javascript_include_tag '/elm/control_module/elm'
 = javascript_include_tag 'https://www.gstatic.com/charts/loader.js'
 
-h1 CarpiControl
-#carpi-control-container style="height:100px"
-#chart-container
-img#stream-container[style="width:100%"]
-#received-data 0 Mb
-#fps-container
+#carpi-control-container
+
+#stream-container
+  #charts-container
+    #chart-torque
+    #chart-direction
+
+  #info-container
+    #received-data 0 Mb
+    #fps-container
 
 javascript:
   var container = document.getElementById('carpi-control-container');
@@ -19,11 +23,24 @@ javascript:
   var lastTimeFPSUpdated = Date.now()
   var currentFPS = 0
 
-  var img = document.getElementById('stream-container')
+  var streamContainer = $('#stream-container')
   var receivedDataElement = $('#received-data')
 
+  var torqueChart = null
+  var directionChart = null
+  var torqueOptions = null
+  var directionOptions = null
+  var torqueData = null
+  var directionData = null
+
+
+  $(window).resize(resizeHandler)
+
   socket.on('stream', function (data) {
-    img.src = 'data:image/jpeg;base64, ' + data.buffer
+    streamContainer.css({
+      'background-size' : 'cover',
+      'background-image': 'url("data:image/jpeg;base64, ' + data.buffer + '")'
+    })
 
     frameTimestampCurrent = Date.now()
     if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
@@ -43,25 +60,40 @@ javascript:
   google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
+    torqueChart = new google.visualization.Gauge(document.getElementById('chart-torque'));
+    directionChart = new google.visualization.Gauge(document.getElementById('chart-direction'));
 
-    var data = google.visualization.arrayToDataTable([
+    torqueOptions = {
+      width: 150,
+      redFrom: 90, redTo: 100,
+      yellowFrom: 75, yellowTo: 90,
+      minorTicks: 5,
+      majorTicks: ['0', 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      animation: {
+        duration: 0
+      }
+    };
+
+    directionOptions = {
+      width: 150,
+      animation: {
+        duration: 0
+      },
+      min: -1,
+      max: 1
+    };
+
+    torqueData = google.visualization.arrayToDataTable([
       ['Label', 'Value'],
-      ['Torque', 0]
+      ['Torque', 0],
     ]);
 
-    var options = {
-              width: 400,
-              height: 200,
-              redFrom: 90, redTo: 100,
-              yellowFrom: 75, yellowTo: 90,
-              minorTicks: 5,
-              majorTicks: ['0', 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-              animation: {
-                duration: 0
-              }
-            };
+    directionData = google.visualization.arrayToDataTable([
+      ['Label', 'Value'],
+      ['Direction', 0]
+    ]);
 
-    var chart = new google.visualization.Gauge(document.getElementById('chart-container'));
+    resizeHandler()
 
     elmApp.ports.externalModel.subscribe(function (model) {
       compressedModel = getCompressedData(model)
@@ -70,10 +102,49 @@ javascript:
         controlModel = compressedModel;
         socket.emit('car-control', controlModel);
 
-        data.setValue(0, 1, controlModel[0]);
-        chart.draw(data, options);
+        directionLevel = (parseFloat(controlModel[1])/100).toFixed(1)
+        if(model.direction < 0)
+          directionLevel *= -1
+
+        torqueData.setValue(0, 1, controlModel[0]);
+        directionData.setValue(0, 1, directionLevel);
+
+        torqueChart.draw(torqueData, torqueOptions);
+        directionChart.draw(directionData, directionOptions);
       }
     });
+  }
+
+  function resizeHandler() {
+    var newWidth = 0
+    var newHeight = 0
+    var currentWidth = $(window).width()
+    var currentHeight = $(window).height() - $('header').height()
+
+    if ((currentHeight / 9) * 16 < currentWidth) {
+      newWidth = (currentHeight / 9) * 16
+      newHeight = currentHeight
+    } else {
+      newWidth = currentWidth
+      newHeight = (currentWidth / 16) * 9
+    }
+
+    $('#stream-container').css({
+      height: newHeight + 'px',
+      width: newWidth + 'px'
+    })
+
+    gaugeDimensions = newHeight * 0.25
+    if (gaugeDimensions > 150)
+      gaugeDimensions = 150
+
+    torqueOptions.width = gaugeDimensions
+    torqueOptions.height = gaugeDimensions
+    directionOptions.width = gaugeDimensions
+    directionOptions.height = gaugeDimensions
+
+    torqueChart.draw(torqueData, torqueOptions);
+    directionChart.draw(directionData, directionOptions);
   }
 
   // TODO move to helper

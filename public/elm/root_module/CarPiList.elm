@@ -45,10 +45,14 @@ view address model =
         buildCardLink "#" "Request Release"
       else
         buildCardLink ("/control/" ++ car) "Control"
+    activeCarsCount = List.length model.cars
+    capturedCarsCount = List.length model.capturedCars
+    totalCarsCount = activeCarsCount + capturedCarsCount
+    layoutNumber = if totalCarsCount > 1 then 6 else 12
     carItem car captured =
-      div [ class "mdl-cell mdl-cell--12-col" ] [
+      div [ class ("mdl-cell mdl-cell--" ++ toString(layoutNumber) ++ "-col") ] [
         div [ class "mdl-card mdl-shadow--2dp center-card car-card" ] [
-          div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text mdl-color-text--white" ] [ text car ] ],
+          div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text" ] [ text car ] ],
           div [ class "mdl-card__actions mdl-card--border" ] [ carLink car captured ],
           div [ class "mdl-card__menu" ] [
             button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ] [ i [ class "material-icons" ] [ text "share" ] ]
@@ -59,13 +63,11 @@ view address model =
       carItem car False
     capturedCarItem car =
       carItem car True
-    list =
-      if List.isEmpty model.cars && List.isEmpty model.capturedCars then
-        [ h1 [ class "center-it" ] [ text "No Vehicles online" ] ]
-      else
-        List.append (List.map activeCarItem model.cars) (List.map capturedCarItem model.capturedCars)
   in
-    div [ class "mdl-grid" ] list
+    if totalCarsCount == 0 then
+      div [ id "carpi-list-wrapper", class "mdl-grid allign-vertically-40" ] [ h1 [ class "center-it" ] [ text "No Vehicles online" ] ]
+    else
+      div [ id "carpi-list-wrapper", class "mdl-grid" ] (List.append (List.map activeCarItem model.cars) (List.map capturedCarItem model.capturedCars))
 
 -- PORTS
 

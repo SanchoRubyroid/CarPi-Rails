@@ -10315,6 +10315,10 @@ Elm.CarPiList.make = function (_elm) {
                                                            })) : _U.badPort("an array",v[1])} : _U.badPort("an array",v);
    });
    var view = F2(function (address,model) {
+      var capturedCarsCount = $List.length(model.capturedCars);
+      var activeCarsCount = $List.length(model.cars);
+      var totalCarsCount = activeCarsCount + capturedCarsCount;
+      var layoutNumber = _U.cmp(totalCarsCount,1) > 0 ? 6 : 12;
       var buildCardLink = F2(function (location,linkText) {
          return A2($Html.a,
          _U.list([$Html$Attributes.$class("mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"),$Html$Attributes.href(location)]),
@@ -10325,12 +10329,12 @@ Elm.CarPiList.make = function (_elm) {
       });
       var carItem = F2(function (car,captured) {
          return A2($Html.div,
-         _U.list([$Html$Attributes.$class("mdl-cell mdl-cell--12-col")]),
+         _U.list([$Html$Attributes.$class(A2($Basics._op["++"],"mdl-cell mdl-cell--",A2($Basics._op["++"],$Basics.toString(layoutNumber),"-col")))]),
          _U.list([A2($Html.div,
          _U.list([$Html$Attributes.$class("mdl-card mdl-shadow--2dp center-card car-card")]),
          _U.list([A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__title default-pic")]),
-                 _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text mdl-color-text--white")]),_U.list([$Html.text(car)]))]))
+                 _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text")]),_U.list([$Html.text(car)]))]))
                  ,A2($Html.div,_U.list([$Html$Attributes.$class("mdl-card__actions mdl-card--border")]),_U.list([A2(carLink,car,captured)]))
                  ,A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__menu")]),
@@ -10340,10 +10344,11 @@ Elm.CarPiList.make = function (_elm) {
       });
       var activeCarItem = function (car) {    return A2(carItem,car,false);};
       var capturedCarItem = function (car) {    return A2(carItem,car,true);};
-      var list = $List.isEmpty(model.cars) && $List.isEmpty(model.capturedCars) ? _U.list([A2($Html.h1,
-      _U.list([$Html$Attributes.$class("center-it")]),
-      _U.list([$Html.text("No Vehicles online")]))]) : A2($List.append,A2($List.map,activeCarItem,model.cars),A2($List.map,capturedCarItem,model.capturedCars));
-      return A2($Html.div,_U.list([$Html$Attributes.$class("mdl-grid")]),list);
+      return _U.eq(totalCarsCount,0) ? A2($Html.div,
+      _U.list([$Html$Attributes.id("carpi-list-wrapper"),$Html$Attributes.$class("mdl-grid allign-vertically-40")]),
+      _U.list([A2($Html.h1,_U.list([$Html$Attributes.$class("center-it")]),_U.list([$Html.text("No Vehicles online")]))])) : A2($Html.div,
+      _U.list([$Html$Attributes.id("carpi-list-wrapper"),$Html$Attributes.$class("mdl-grid")]),
+      A2($List.append,A2($List.map,activeCarItem,model.cars),A2($List.map,capturedCarItem,model.capturedCars)));
    });
    var update = F2(function (action,model) {
       var _p0 = action;

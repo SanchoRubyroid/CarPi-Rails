@@ -8,6 +8,21 @@ javascript:
   var elmApp = Elm.embed(Elm.CarPiList, container, {vehicles: [[],[]]})
   var socket = io('#{Rails.application.config.node_app_url}/list');
 
+  resizeHandler()
+  $(window).resize(resizeHandler)
+
+  function resizeHandler() {
+    var h1Element = $('#carpi-list-wrapper').find('h1')
+    var currentWidth = $(window).width()
+    var newHeight = $(window).height() - $('header').height()
+    $('#carpi-list-container').css('height', newHeight + 'px')
+
+    if(currentWidth < 608)
+      h1Element.addClass('smaller')
+    else
+      h1Element.removeClass('smaller')
+  }
+
   socket.on('cars-list', function (list) {
     elmApp.ports.vehicles.send(list);
   });

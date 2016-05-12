@@ -4,12 +4,14 @@
 #carpi-control-container
 
 #stream-container
+  #progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
+
   #charts-container
     #chart-torque
     #chart-direction
 
   #info-container
-    #received-data 0 Mb
+    #received-data
     #fps-container
 
 javascript:
@@ -33,14 +35,28 @@ javascript:
   var torqueData = null
   var directionData = null
 
+  setTimeout(function(){
+    if($('#progress-intermediate').length > 0) {
+      $('#progress-intermediate').removeClass('mdl-progress')
+      $('#progress-intermediate').html('<h4>No video response :(</h4>')
+
+      setTimeout(function(){
+        $('#progress-intermediate').remove()
+      }, 2000)
+    }
+  }, 5000)
+
 
   $(window).resize(resizeHandler)
+  resizeHandler()
+
+  socket.on('before-stream', function(){
+    $('#progress-intermediate').remove()
+    streamContainer.css('background-size', 'cover')
+  })
 
   socket.on('stream', function (data) {
-    streamContainer.css({
-      'background-size' : 'cover',
-      'background-image': 'url("data:image/jpeg;base64, ' + data.buffer + '")'
-    })
+    streamContainer.css('background-image', 'url("data:image/jpeg;base64, ' + data.buffer + '")')
 
     frameTimestampCurrent = Date.now()
     if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
@@ -93,8 +109,6 @@ javascript:
       ['Direction', 0]
     ]);
 
-    resizeHandler()
-
     elmApp.ports.externalModel.subscribe(function (model) {
       compressedModel = getCompressedData(model)
 
@@ -115,7 +129,7 @@ javascript:
     });
   }
 
-  function resizeHandler() {
+  function resizeHandler(event) {
     var newWidth = 0
     var newHeight = 0
     var currentWidth = $(window).width()
@@ -134,17 +148,19 @@ javascript:
       width: newWidth + 'px'
     })
 
-    gaugeDimensions = newHeight * 0.25
-    if (gaugeDimensions > 150)
-      gaugeDimensions = 150
+    if(event) {
+      gaugeDimensions = newHeight * 0.25
+      if (gaugeDimensions > 150)
+        gaugeDimensions = 150
 
-    torqueOptions.width = gaugeDimensions
-    torqueOptions.height = gaugeDimensions
-    directionOptions.width = gaugeDimensions
-    directionOptions.height = gaugeDimensions
+      torqueOptions.width = gaugeDimensions
+      torqueOptions.height = gaugeDimensions
+      directionOptions.width = gaugeDimensions
+      directionOptions.height = gaugeDimensions
 
-    torqueChart.draw(torqueData, torqueOptions);
-    directionChart.draw(directionData, directionOptions);
+      torqueChart.draw(torqueData, torqueOptions);
+      directionChart.draw(directionData, directionOptions);
+    }
   }
 
   // TODO move to helper

@@ -4,6 +4,7 @@
 #carpi-control-container
 
 #stream-container
+  img#mjpg-container[src="http://159.203.81.18:8080/?action=stream"]
   #progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
 
   #charts-container
@@ -45,6 +46,8 @@ javascript:
       }, 2000)
     }
   }, 5000)
+
+  $('#progress-intermediate').remove()
 
 
   $(window).resize(resizeHandler)

@@ -6,6 +6,15 @@
     background: lightgrey url(<%= asset_path 'no_video.png' %>) no-repeat center;
 }
 
+#mjpg-container {
+    width:100%;
+    -webkit-transform: rotate(-180deg);
+    -moz-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    -o-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+
 #charts-container {
     position: absolute;
     bottom: 10px;

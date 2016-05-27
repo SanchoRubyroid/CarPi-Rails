@@ -69,9 +69,7 @@ namespace :deploy do
       forever_options << "--minUptime 1000"
       forever_options << "--spinSleepTime 2000"
 
-
-
-      execute "cd #{node_app_path} && git pull"
+      execute "cd #{node_app_path} && git pull && npm install"
       execute 'forever stopall'
       execute "forever start #{forever_options.join(' ')} #{node_app_path}/main_wrapper.js"
     end

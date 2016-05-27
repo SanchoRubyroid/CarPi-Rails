@@ -73,7 +73,7 @@ namespace :deploy do
 
       execute "cd #{node_app_path} && git pull"
       execute 'forever stopall'
-      execute "forever start #{forever_options.join(' ')} #{node_app_path}/main.js"
+      execute "forever start #{forever_options.join(' ')} #{node_app_path}/main_wrapper.js"
     end
   end
 

@@ -3,74 +3,68 @@
 
 #carpi-control-container
 
-#stream-container
-  img#mjpg-container[src="http://159.203.81.18:8080/?action=stream"]
-  #progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
+.stream-container
+  canvas#video-canvas.stream-container
+  /#progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
 
   #charts-container
     #chart-torque
     #chart-direction
 
-  #info-container
-    #received-data 0 Mb
-    #fps-container
+  /#info-container
+  /  #received-data 0 Mb
+  /  #fps-container
 
 javascript:
   var container = document.getElementById('carpi-control-container');
-  var elmApp = Elm.embed(Elm.CarPi, container)
-  var controlModel = {}
+  var elmApp = Elm.embed(Elm.CarPi, container);
+  var controlModel = {};
 
   var socket = io('#{Rails.application.config.node_app_url}/control');
 
-  var frameTimestampPrev = Date.now()
-  var lastTimeFPSUpdated = Date.now()
-  var currentFPS = 0
+  //var frameTimestampPrev = Date.now();
+  //var lastTimeFPSUpdated = Date.now();
+  //var currentFPS = 0;
 
-  var streamContainer = $('#stream-container')
-  var receivedDataElement = $('#received-data')
+  var streamContainer = $('#stream-container');
+  var receivedDataElement = $('#received-data');
 
-  var torqueChart = null
-  var directionChart = null
-  var torqueOptions = null
-  var directionOptions = null
-  var torqueData = null
-  var directionData = null
+  var torqueChart = null;
+  var directionChart = null;
+  var torqueOptions = null;
+  var directionOptions = null;
+  var torqueData = null;
+  var directionData = null;
 
-  setTimeout(function(){
-    if($('#progress-intermediate').length > 0) {
-      $('#progress-intermediate').removeClass('mdl-progress')
-      $('#progress-intermediate').html('<h4>No video response :(</h4>')
+  var ratio_horizontal = 16;
+  var ratio_vertical = 9;
 
-      setTimeout(function(){
-        $('#progress-intermediate').remove()
-      }, 2000)
-    }
-  }, 5000)
+  //setTimeout(function(){
+  //  if($('#progress-intermediate').length > 0) {
+  //    $('#progress-intermediate').removeClass('mdl-progress')
+  //    $('#progress-intermediate').html('<h4>No video response :(</h4>')
+  //
+  //    setTimeout(function(){
+  //      $('#progress-intermediate').remove()
+  //    }, 2000)
+  //  }
+  //}, 5000)
 
   $('#progress-intermediate').remove()
-
 
   $(window).resize(resizeHandler)
   resizeHandler()
 
-  socket.on('before-stream', function(){
-    $('#progress-intermediate').remove()
-    streamContainer.css('background-size', 'cover')
-  })
+  //socket.on('before-stream', function(){
+  //  $('#progress-intermediate').remove()
+  //  streamContainer.css('background-size', 'cover')
+  //})
 
   socket.on('stream', function (data) {
-    streamContainer.css('background-image', 'url("data:image/jpeg;base64, ' + data.buffer + '")')
+    var client = new WebSocket('ws://#{Rails.application.config.server_host}:' + data.port + '/');
 
-    frameTimestampCurrent = Date.now()
-    if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
-      currentFPS = (1000 / (frameTimestampCurrent - frameTimestampPrev))
-      $('#fps-container').html('FPS: ' + Math.round(currentFPS))
-      lastTimeFPSUpdated = frameTimestampCurrent
-    }
-
-    frameTimestampPrev = frameTimestampCurrent
-
-    receivedDataElement.html((parseFloat(receivedDataElement.html()) + (parseFloat(data.buffer.length) / 1024 / 1024)).toFixed(2) + ' Mb')
+    var canvas = document.getElementById('video-canvas');
+    var player = new jsmpeg(client, {canvas: canvas});
   })
 
   socket.emit('capture', '#{params['id']}');
@@ -140,15 +134,15 @@ javascript:
     var currentWidth = $(window).width()
     var currentHeight = $(window).height() - $('header').height()
 
-    if ((currentHeight / 9) * 16 < currentWidth) {
-      newWidth = (currentHeight / 9) * 16
+    if ((currentHeight / ratio_vertical) * ratio_horizontal < currentWidth) {
+      newWidth = (currentHeight / ratio_vertical) * ratio_horizontal
       newHeight = currentHeight
     } else {
       newWidth = currentWidth
-      newHeight = (currentWidth / 16) * 9
+      newHeight = (currentWidth / ratio_horizontal) * ratio_vertical
     }
 
-    $('#stream-container').css({
+    $('.stream-container').css({
       height: newHeight + 'px',
       width: newWidth + 'px'
     })

@@ -39,5 +39,6 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  config.node_app_url = 'http://127.0.0.1:3001'
+  config.server_host = '127.0.0.1'
+  config.node_app_url = "http://#{config.server_host}:3001"
 end

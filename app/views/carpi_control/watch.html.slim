@@ -1,85 +1,38 @@
-#stream-container
-  #progress-intermediate.mdl-progress.mdl-js-progress.mdl-progress__indeterminate
-
-  #info-container
-    #received-data 0 Mb
-    #fps-container
+.stream-container
+  canvas#video-canvas.stream-container
 
 javascript:
   var socket = io('#{Rails.application.config.node_app_url}/watch');
 
-  var frameTimestampPrev = Date.now()
-  var lastTimeFPSUpdated = Date.now()
-  var currentFPS = 0
+  var ratio_horizontal = 16;
+  var ratio_vertical = 9;
 
-  var streamContainer = $('#stream-container')
-  var receivedDataElement = $('#received-data')
-
-  setTimeout(function(){
-    if($('#progress-intermediate').length > 0) {
-      $('#progress-intermediate').removeClass('mdl-progress')
-      $('#progress-intermediate').html('<h4>No video response :(</h4>')
-
-      setTimeout(function(){
-        $('#progress-intermediate').remove()
-      }, 2000)
-    }
-  }, 5000)
-
-
-  $(window).resize(resizeHandler)
-  resizeHandler()
+  $(window).resize(resizeHandler);
+  resizeHandler();
 
   socket.on('stream', function (data) {
-    if($('#progress-intermediate').length > 0) {
-      $('#progress-intermediate').remove()
-      streamContainer.css('background-size', 'cover')
-    }
+    var client = new WebSocket('ws://#{Rails.application.config.server_host}:' + data.port + '/');
 
-    streamContainer.css('background-image', 'url("data:image/jpeg;base64, ' + data.buffer + '")')
-
-    frameTimestampCurrent = Date.now()
-    if((frameTimestampCurrent - lastTimeFPSUpdated) > 100) {
-      currentFPS = (1000 / (frameTimestampCurrent - frameTimestampPrev))
-      $('#fps-container').html('FPS: ' + Math.round(currentFPS))
-      lastTimeFPSUpdated = frameTimestampCurrent
-    }
-
-    frameTimestampPrev = frameTimestampCurrent
-
-    receivedDataElement.html((parseFloat(receivedDataElement.html()) + (parseFloat(data.buffer.length) / 1024 / 1024)).toFixed(2) + ' Mb')
+    var canvas = document.getElementById('video-canvas');
+    var player = new jsmpeg(client, {canvas: canvas});
   })
 
-  function resizeHandler(event) {
-    var newWidth = 0
-    var newHeight = 0
-    var currentWidth = $(window).width()
-    var currentHeight = $(window).height() - $('header').height()
+  socket.emit('get-streaming-port', '#{params['id']}');
 
-    if ((currentHeight / 9) * 16 < currentWidth) {
-      newWidth = (currentHeight / 9) * 16
-      newHeight = currentHeight
+  function resizeHandler() {
+    var currentWidth = $(window).width();
+    var currentHeight = $(window).height() - $('header').height();
+
+    if ((currentHeight / ratio_vertical) * ratio_horizontal < currentWidth) {
+      newWidth = (currentHeight / ratio_vertical) * ratio_horizontal;
+      newHeight = currentHeight;
     } else {
-      newWidth = currentWidth
-      newHeight = (currentWidth / 16) * 9
+      newWidth = currentWidth;
+      newHeight = (currentWidth / ratio_horizontal) * ratio_vertical;
     }
 
-    $('#stream-container').css({
+    $('.stream-container').css({
       height: newHeight + 'px',
       width: newWidth + 'px'
-    })
-
-    if(event) {
-      gaugeDimensions = newHeight * 0.25
-      if (gaugeDimensions > 150)
-        gaugeDimensions = 150
-
-      torqueOptions.width = gaugeDimensions
-      torqueOptions.height = gaugeDimensions
-      directionOptions.width = gaugeDimensions
-      directionOptions.height = gaugeDimensions
-
-      torqueChart.draw(torqueData, torqueOptions);
-      directionChart.draw(directionData, directionOptions);
-    }
+    });
   }

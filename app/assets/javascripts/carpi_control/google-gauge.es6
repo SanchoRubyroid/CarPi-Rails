@@ -46,6 +46,7 @@ export default class GoogleGauge{
         this.data = gaugeData;
         this.options = gaugeOptions;
         this.chart = new google.visualization.Gauge(document.getElementById(containerId));
+        this._render();
     }
 
     update(newValue){

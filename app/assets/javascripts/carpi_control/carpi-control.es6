@@ -20,10 +20,11 @@ export default class CarpiControl{
         this.socket = io(`${nodeAppUrl}/${channel}`);
         this._initializeSocketEvents(serverHost, vehicleName);
 
-        this.ratio_horizontal = 16;
-        this.ratio_vertical = 12;
+        this.ratio = { horizontal: 16, vertical: 9 };
 
-        $(window).resize(this._resizeHandler);
+        $(window).resize(() => {
+            this._resizeHandler();
+        });
     }
 
     _initializeSocketEvents(serverHost, vehicleName){
@@ -32,10 +33,18 @@ export default class CarpiControl{
         })
 
         this.socket.on('stream', (data) => {
+            this.ratio = data.ratio;
+
             let client = new WebSocket(`ws://${serverHost}:${data.port}/`);
 
             let canvas = document.getElementById('video-canvas');
             new jsmpeg(client, {canvas: canvas});
+
+            this._resizeHandler();
+        })
+
+        this.socket.on('release', () => {
+            window.location = '/';
         })
 
         this.socket.emit('capture', vehicleName);
@@ -85,18 +94,18 @@ export default class CarpiControl{
         let currentWidth = $(window).width();
         let currentHeight = $(window).height() - $('header').height();
 
-        if ((currentHeight / this.ratio_vertical) * this.ratio_horizontal < currentWidth) {
-            newWidth = (currentHeight / this.ratio_vertical) * this.ratio_horizontal;
+        if ((currentHeight / this.ratio.vertical) * this.ratio.horizontal < currentWidth) {
+            newWidth = (currentHeight / this.ratio.vertical) * this.ratio.horizontal;
             newHeight = currentHeight;
         } else {
             newWidth = currentWidth;
-            newHeight = (currentWidth / this.ratio_horizontal) * this.ratio_vertical;
+            newHeight = (currentWidth / this.ratio.horizontal) * this.ratio.vertical;
         }
 
         $('.stream-container').css({
             height: newHeight + 'px',
             width: newWidth + 'px'
-        })
+        });
 
         if(this.gaugesInitialized) {
             let gaugeDimensions = newHeight * 0.25;

@@ -71,7 +71,7 @@ namespace :deploy do
 
       execute "cd #{node_app_path} && git pull && npm install"
       execute 'forever stopall'
-      execute "forever start #{forever_options.join(' ')} #{node_app_path}/main_wrapper.js"
+      execute "forever start #{forever_options.join(' ')} #{node_app_path}/start.js"
     end
   end
 

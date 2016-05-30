@@ -12,4 +12,5 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require_tree .
+//= require ./material.min.js
+//= require ./socket.io-1.4.5

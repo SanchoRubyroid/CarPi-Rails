@@ -52,6 +52,16 @@ namespace :deploy do
     end
   end
 
+  task :npm_install do
+    on roles(:app) do
+      info 'ES6 Support'
+
+      within release_path do
+        execute :rake, 'npm:install:clean'
+      end
+    end
+  end
+
   task :start_node_app do
     on roles(:app) do
       info 'Start Socket.IO support'
@@ -91,6 +101,8 @@ namespace :deploy do
       # end
     end
   end
+
+  before 'deploy:assets:precompile', 'deploy:npm_install'
 
   after :finishing, 'deploy:cleanup'
   after :finishing, 'deploy:start_node_app'

@@ -2,37 +2,12 @@
   canvas#video-canvas.stream-container
 
 javascript:
-  var socket = io('#{Rails.application.config.node_app_url}/watch');
-
-  var ratio_horizontal = 16;
-  var ratio_vertical = 12;
-
-  $(window).resize(resizeHandler);
-  resizeHandler();
-
-  socket.on('stream', function (data) {
-    var client = new WebSocket('ws://#{Rails.application.config.server_host}:' + data.port + '/');
-
-    var canvas = document.getElementById('video-canvas');
-    var player = new jsmpeg(client, {canvas: canvas});
-  })
-
-  socket.emit('get-streaming-port', '#{params['id']}');
-
-  function resizeHandler() {
-    var currentWidth = $(window).width();
-    var currentHeight = $(window).height() - $('header').height();
-
-    if ((currentHeight / ratio_vertical) * ratio_horizontal < currentWidth) {
-      newWidth = (currentHeight / ratio_vertical) * ratio_horizontal;
-      newHeight = currentHeight;
-    } else {
-      newWidth = currentWidth;
-      newHeight = (currentWidth / ratio_horizontal) * ratio_vertical;
-    }
-
-    $('.stream-container').css({
-      height: newHeight + 'px',
-      width: newWidth + 'px'
-    });
+  let options = {
+    nodeAppUrl: '#{Rails.application.config.node_app_url}',
+    serverHost: '#{Rails.application.config.server_host}',
+    vehicleName: '#{params["id"]}',
+    watcher: true
   }
+
+= javascript_include_tag 'jsmpg'
+= javascript_include_tag 'carpi_control/main'

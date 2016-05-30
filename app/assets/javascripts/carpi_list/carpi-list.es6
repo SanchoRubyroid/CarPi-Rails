@@ -5,7 +5,8 @@ export default class CarpiList {
         this.socket = io(`${options.nodeAppUrl}/list`);
         this._initializeSocketEvents();
 
-        $(window).resize(this.resizeHandler);
+        $(window).resize(this._resizeHandler);
+        this._resizeHandler();
     }
 
     _initializeSocketEvents(){
@@ -14,7 +15,7 @@ export default class CarpiList {
         });
     }
 
-    resizeHandler() {
+    _resizeHandler() {
         let caption = $('#carpi-list-wrapper').find('h1');
         let currentWidth = $(window).width();
         let newHeight = $(window).height() - $('header').height();

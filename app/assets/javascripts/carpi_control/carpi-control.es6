@@ -2,25 +2,25 @@ import GoogleGauge from './google-gauge.es6'
 
 export default class CarpiControl{
     constructor({ nodeAppUrl, serverHost, vehicleName, watcher = false}) {
+        this.ratio = { horizontal: 16, vertical: 9 };
+
         if(!watcher) {
             GoogleGauge.load(() => {
                 this.torqueGauge = GoogleGauge.getTorqueGauge();
                 this.directionGauge = GoogleGauge.getDirectionGauge();
 
-                this._resizeHandler()
                 this.gaugesInitialized = true;
+                this._resizeHandler()
             });
 
             let container = document.getElementById('carpi-control-container');
             this.elmApp = Elm.embed(Elm.CarPi, container);
             this._initializeElmControl();
-        } else this._resizeHandler();
+        }
 
         let channel = (watcher ? 'watch' : 'control' );
         this.socket = io(`${nodeAppUrl}/${channel}`);
         this._initializeSocketEvents(serverHost, vehicleName);
-
-        this.ratio = { horizontal: 16, vertical: 9 };
 
         $(window).resize(() => {
             this._resizeHandler();

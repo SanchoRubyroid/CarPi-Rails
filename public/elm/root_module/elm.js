@@ -10337,7 +10337,7 @@ Elm.CarPiList.make = function (_elm) {
          _U.list([$Html$Attributes.$class("mdl-card mdl-shadow--2dp center-card car-card")]),
          _U.list([A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__title default-pic")]),
-                 _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text")]),_U.list([$Html.text(car)]))]))
+                 _U.list([A2($Html.h2,_U.list([$Html$Attributes.$class("mdl-card__title-text mdl-color-text--white")]),_U.list([$Html.text(car)]))]))
                  ,A2($Html.div,_U.list([$Html$Attributes.$class("mdl-card__actions mdl-card--border")]),A2(carLink,car,captured))
                  ,A2($Html.div,
                  _U.list([$Html$Attributes.$class("mdl-card__menu")]),

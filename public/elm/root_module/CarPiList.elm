@@ -52,7 +52,7 @@ view address model =
     carItem car captured =
       div [ class ("mdl-cell mdl-cell--" ++ toString(layoutNumber) ++ "-col") ] [
         div [ class "mdl-card mdl-shadow--2dp center-card car-card" ] [
-          div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text" ] [ text car ] ],
+          div [ class "mdl-card__title default-pic" ] [ h2 [ class "mdl-card__title-text mdl-color-text--white" ] [ text car ] ],
           div [ class "mdl-card__actions mdl-card--border" ] (carLink car captured),
           div [ class "mdl-card__menu" ] [
             button [ class "mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" ] [ i [ class "material-icons" ] [ text "share" ] ]

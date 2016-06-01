@@ -14,3 +14,4 @@
 //= require jquery_ujs
 //= require ./material.min.js
 //= require ./socket.io-1.4.5
+//= require ./dialog-polyfill

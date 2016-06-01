@@ -25,6 +25,30 @@ export default class CarpiControl{
         $(window).resize(() => {
             this._resizeHandler();
         });
+
+        // TODO move to a separate class
+        let dialog = document.querySelector('dialog');
+        dialogPolyfill.registerDialog(dialog);
+
+        $('#video-settings-button').click(() => {
+            dialog.showModal();
+        });
+
+        $('#release-button').click(() => {
+            window.location = '/';
+        });
+
+
+        $('dialog .close').click(() => {
+            dialog.close();
+        });
+
+        $('dialog .apply').click(() => {
+            this.socket.emit('video-settings', {
+                videoQuality: $('#video-quality-slider').val()
+            });
+            dialog.close();
+        });
     }
 
     _initializeSocketEvents(serverHost, vehicleName){

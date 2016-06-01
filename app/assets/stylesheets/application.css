@@ -24,10 +24,7 @@
 }
 
 .car-card .default-pic {
-    /*background: url('https://img1.etsystatic.com/070/2/9754095/il_fullxfull.824677571_pc3n.jpg') center / cover;*/
-    background: url('http://1.bp.blogspot.com/-T5kOyI7ZyBA/VBUo17QZW8I/AAAAAAAAEwI/A06-faaIwfc/s1600/16-lada-2103-pencil-drawing.png') center / cover;
-    /*background: url('http://i0.wp.com/www.compositestoday.com/wp-content/uploads/2015/01/cirin-wheel.jpg') center / cover;*/
-    /*background: url('https://s-media-cache-ak0.pinimg.com/736x/d8/f6/40/d8f6407f42eeeb6fb66a161ceab9068a.jpg') center / cover;*/
+    background: url('default-car.jpg') center / cover;
     height: 300px;
 }
 

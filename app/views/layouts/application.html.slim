@@ -21,17 +21,15 @@ html
           span.mdl-layout-title CarPi Web
           .mdl-layout-spacer
           nav.mdl-navigation.mdl-layout--large-screen-only
-            = link_to('Home', root_path, {class: 'mdl-navigation__link'})
-            = link_to('Link', '#', {class: 'mdl-navigation__link'})
-            = link_to('Link', '#', {class: 'mdl-navigation__link'})
-            = link_to('Link', '#', {class: 'mdl-navigation__link'})
+            = link_to('home', root_path, {id: 'home-link', class: 'material-icons icon mdl-navigation__link'})
+            /= link_to('settings_applications', '#', {id: 'settings-link', class: 'material-icons icon mdl-navigation__link'})
+            /.mdl-tooltip[for='home-link'] Home Page
+            /.mdl-tooltip[for='settings-link'] Settings
 
       .mdl-layout__drawer
         span.mdl-layout-title CarPi Web
         nav.mdl-navigation
           = link_to('Home', root_path, {class: 'mdl-navigation__link'})
-          = link_to('Link', '#', {class: 'mdl-navigation__link'})
-          = link_to('Link', '#', {class: 'mdl-navigation__link'})
-          = link_to('Link', '#', {class: 'mdl-navigation__link'})
+          /= link_to('Settings', '#', {class: 'mdl-navigation__link'})
       main.mdl-layout__content
         = yield

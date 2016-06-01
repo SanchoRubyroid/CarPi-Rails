@@ -1,0 +1,25 @@
+dialog {
+    opacity: 0.8;
+}
+
+dialog .legend-container {
+    margin-bottom: 20px;
+    position: relative;
+    font-size: smaller;
+}
+
+dialog .legend-spacer {
+    margin-bottom: 20px;
+}
+
+dialog .legend-container .left-value {
+    position: absolute;
+    top: 0px;
+    left: 10px;
+}
+
+dialog .legend-container .right-value {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+}

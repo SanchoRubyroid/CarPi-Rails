@@ -1,8 +1,10 @@
 import GoogleGauge from './google-gauge.es6'
+import ButtonsPanel from './buttons-panel.es6'
 
 export default class CarpiControl{
     constructor({ nodeAppUrl, serverHost, vehicleName, watcher = false}) {
         this.ratio = { horizontal: 16, vertical: 9 };
+        this.vehicleName = vehicleName;
 
         if(!watcher) {
             GoogleGauge.load(() => {
@@ -20,46 +22,26 @@ export default class CarpiControl{
 
         let channel = (watcher ? 'watch' : 'control' );
         this.socket = io(`${nodeAppUrl}/${channel}`);
-        this._initializeSocketEvents(serverHost, vehicleName);
+        this._initializeSocketEvents(serverHost);
 
         $(window).resize(() => {
             this._resizeHandler();
         });
 
-        // TODO move to a separate class
-        let dialog = document.querySelector('dialog');
-        dialogPolyfill.registerDialog(dialog);
-
-        $('#video-settings-button').click(() => {
-            dialog.showModal();
-        });
-
-        $('#release-button').click(() => {
-            window.location = '/';
-        });
-
-
-        $('dialog .close').click(() => {
-            dialog.close();
-        });
-
-        $('dialog .apply').click(() => {
-            this.socket.emit('video-settings', {
-                videoQuality: $('#video-quality-slider').val()
-            });
-            dialog.close();
-        });
+        this._initializeButtonsPanel();
     }
 
-    _initializeSocketEvents(serverHost, vehicleName){
+    _initializeSocketEvents(serverHost){
         this.socket.on('before-stream', () => {
             //implement hook if needed
         })
 
-        this.socket.on('stream', (data) => {
-            this.ratio = data.ratio;
+        this.socket.on('stream', (settings) => {
+            this.ratio = settings.ratio;
 
-            let client = new WebSocket(`ws://${serverHost}:${data.port}/`);
+            this._processAccessories(settings.accessories)
+
+            let client = new WebSocket(`ws://${serverHost}:${settings.port}/`);
 
             let canvas = document.getElementById('video-canvas');
             new jsmpeg(client, {canvas: canvas});
@@ -71,7 +53,7 @@ export default class CarpiControl{
             window.location = '/';
         })
 
-        this.socket.emit('capture', vehicleName);
+        this.socket.emit('capture', this.vehicleName);
     }
 
     _initializeElmControl(){
@@ -91,6 +73,37 @@ export default class CarpiControl{
                 }
             }
         });
+    }
+
+    _initializeButtonsPanel(){
+        this.buttonsPanel = new ButtonsPanel();
+
+        this.buttonsPanel.composeLightsButton(() => {
+            let lights = this.buttonsPanel.getElement('lights');
+            lights.toggleClass('mdl-color-text--white');
+
+            this.socket.emit('toggle-lights', this.vehicleName);
+        });
+
+        this.buttonsPanel.composeVideoButton(() => {
+            this.socket.emit('video-settings', {
+                videoQuality: $('#video-quality-slider').val()
+            });
+        })
+
+        this.buttonsPanel.composeChangeCameraButton(() => {
+            this.socket.emit('change-camera');
+        });
+
+        this.buttonsPanel.composeReleaseButton();
+    }
+
+    _processAccessories(accessories){
+        if(accessories){
+            if(accessories.includes('lights')){
+                this.buttonsPanel.getElement('lights').removeClass('hidden');
+            }
+        }
     }
 
     _getCompressedData(model) {

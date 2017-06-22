@@ -1,9 +1,10 @@
 export default class ButtonsPanel{
     constructor(){
-        this.lightsButton = $('button#lights-button')
-        this.videoSettingsButton = $('button#video-settings-button')
-        this.changeCameraButton = $('button#change-camera-button')
-        this.releaseVehicleContainer = $('button#release-button')
+        this.lightsButton = $('button#lights-button');
+        this.videoSettingsButton = $('button#video-settings-button');
+        this.vehicleSettingsButton = $('button#vehicle-settings-button');
+        this.changeCameraButton = $('button#change-camera-button');
+        this.releaseVehicleContainer = $('button#release-button');
     }
 
     composeLightsButton(clickHandler){
@@ -11,21 +12,11 @@ export default class ButtonsPanel{
     }
 
     composeVideoButton(applyHandler){
-        let videoDialog = document.querySelector('#video-settings-dialog');
-        dialogPolyfill.registerDialog(videoDialog);
+        this._composeDialog('video-settings-dialog', this.videoSettingsButton, applyHandler);
+    }
 
-        this.videoSettingsButton.click(() => {
-            videoDialog.showModal();
-        });
-
-        $('dialog#video-settings-dialog .close').click(() => {
-            videoDialog.close();
-        });
-
-        $('dialog#video-settings-dialog .apply').click(() => {
-            applyHandler.call()
-            videoDialog.close();
-        });
+    composeVehicleButton(applyHandler){
+        this._composeDialog('vehicle-settings-dialog', this.vehicleSettingsButton, applyHandler);
     }
 
     composeChangeCameraButton(clickHandler){
@@ -39,6 +30,24 @@ export default class ButtonsPanel{
     }
 
     getElement(id){
-        return $(`button#${id}-button`)
+        return $(`button#${id}-button`);
+    }
+
+    _composeDialog(dialogContainerId, activateDialogButton, applyHandler){
+        let dialog = document.querySelector(`dialog#${dialogContainerId}`);
+        dialogPolyfill.registerDialog(dialog);
+
+        activateDialogButton.click(() => {
+            dialog.showModal();
+        });
+
+        $(`dialog#${dialogContainerId} .close`).click(() => {
+            dialog.close();
+        });
+
+        $(`dialog#${dialogContainerId} .apply`).click(() => {
+            if(applyHandler) applyHandler.call()
+            dialog.close();
+        });
     }
 }

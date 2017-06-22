@@ -23,3 +23,11 @@ dialog .legend-container .right-value {
     top: 0px;
     right: 10px;
 }
+
+dialog .slider-container {
+    padding-bottom: 25px;
+}
+
+dialog .slider-container .caption {
+    padding: 7px;
+}

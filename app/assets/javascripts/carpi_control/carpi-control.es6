@@ -87,9 +87,11 @@ export default class CarpiControl{
 
         this.buttonsPanel.composeVideoButton(() => {
             this.socket.emit('video-settings', {
-                videoQuality: $('#video-quality-slider').val()
+                videoQuality: $('dialog#video-settings-dialog #video-quality-slider').val()
             });
-        })
+        });
+
+        this.buttonsPanel.composeVehicleButton();
 
         this.buttonsPanel.composeChangeCameraButton(() => {
             this.socket.emit('change-camera');

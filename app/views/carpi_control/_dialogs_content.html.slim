@@ -1,10 +1,35 @@
 dialog#video-settings-dialog.mdl-dialog
   .mdl-dialog__content
-    p Video Quality
-    input#video-quality-slider.mdl-slider[type='range' min='0' max='2' value='1' step='1']
-    .legend-container
-      .left-value Low
-      .right-value High
+    .slider-container
+      .caption Video Quality
+      input#video-quality-slider.mdl-slider[type='range' min='0' max='2' value='1' step='1']
+      .legend-container
+        .left-value Low
+        .right-value High
+  .mdl-dialog__actions
+    button.mdl-button.close[type="button"] Close
+    button.mdl-button.apply[type="button"] Apply
+
+dialog#vehicle-settings-dialog.mdl-dialog
+  .mdl-dialog__content
+    .slider-container
+      .caption Torque
+      input#torque-power-slider.mdl-slider[type='range' min='1' max='40' value='20' step='1']
+      .legend-container
+        .left-value Min
+        .right-value Max
+    .slider-container
+      .caption Steering Power
+      input#steering-power-slider.mdl-slider[type='range' min='1' max='20' value='5' step='1']
+      .legend-container
+        .left-value Min
+        .right-value Max
+    .slider-container
+      .caption Braking Power
+      input#braking-power-slider.mdl-slider[type='range' min='2' max='10' value='3' step='1']
+      .legend-container
+        .left-value Min
+        .right-value Max
   .mdl-dialog__actions
     button.mdl-button.close[type="button"] Close
     button.mdl-button.apply[type="button"] Apply
